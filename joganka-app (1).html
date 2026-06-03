@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>যোগ অনুশীলন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Anek+Bangla:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f172a;--card:#1e293b;--card2:#162032;
+  --accent:#34d399;--accent2:#a78bfa;
+  --green:#34d399;--red:#f87171;--yellow:#fbbf24;--blue:#38bdf8;
+  --text:#e2e8f0;--muted:#94a3b8;--border:#334155;--radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Hind Siliguri',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:16px;}
+
+.header{text-align:center;padding:20px 0 14px;}
+.header h1{font-size:1.9rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.header p{color:var(--muted);font-size:.9rem;margin-top:4px;}
+
+/* main tabs */
+.tabs{display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap;}
+.tab-btn{padding:9px 18px;border-radius:50px;border:2px solid var(--border);background:transparent;color:var(--muted);font-family:'Hind Siliguri',sans-serif;font-size:.88rem;cursor:pointer;transition:all .25s;}
+.tab-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#0f172a;font-weight:700;}
+
+.panel{display:none;}.panel.active{display:block;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+.card-title{font-size:.98rem;font-weight:600;color:var(--accent);margin-bottom:14px;}
+
+/* sub-tabs for line count */
+.subtabs{display:flex;gap:6px;justify-content:center;margin-bottom:16px;flex-wrap:wrap;}
+.subtab-btn{padding:7px 16px;border-radius:50px;border:2px solid var(--border);background:transparent;color:var(--muted);font-family:'Hind Siliguri',sans-serif;font-size:.82rem;cursor:pointer;transition:all .22s;}
+.subtab-btn.active{background:linear-gradient(135deg,#0ea5e9,var(--accent2));border-color:transparent;color:#fff;font-weight:700;}
+
+/* entry grid for multiple numbers */
+.entry-grid{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-bottom:14px;max-width:340px;margin-left:auto;margin-right:auto;}
+.entry-row-item{display:flex;align-items:center;gap:8px;}
+.entry-lbl{color:var(--muted);font-size:.72rem;min-width:52px;text-align:right;}
+.entry-inp{width:130px;background:var(--card2);border:2px solid var(--border);border-radius:10px;color:var(--text);font-family:'Anek Bangla',sans-serif;font-size:1.2rem;font-weight:700;text-align:right;padding:8px 12px;outline:none;transition:border-color .2s;-moz-appearance:textfield;}
+.entry-inp:focus{border-color:var(--accent);}
+.entry-inp::-webkit-outer-spin-button,.entry-inp::-webkit-inner-spin-button{-webkit-appearance:none;}
+.plus-sym{color:var(--accent);font-size:1.4rem;font-weight:700;min-width:20px;text-align:center;}
+.set-btn{padding:9px 16px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0f172a;font-family:'Hind Siliguri',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;margin-top:6px;align-self:center;}
+
+/* carry row */
+.carry-row{display:flex;gap:3px;justify-content:flex-end;min-height:22px;margin-bottom:2px;}
+.carry-spacer{min-width:68px;flex-shrink:0;}
+.carry-cell{width:44px;text-align:center;font-family:'Anek Bangla',sans-serif;font-size:.9rem;font-weight:700;color:var(--yellow);min-height:18px;line-height:1.2;}
+
+/* place labels */
+.place-labels{display:flex;gap:3px;justify-content:flex-end;margin-bottom:2px;}
+.pl-lbl{width:44px;text-align:center;font-size:.58rem;color:var(--muted);}
+
+/* number rows */
+.num-row{display:flex;align-items:center;gap:0;justify-content:flex-end;margin-bottom:3px;}
+.row-label{color:var(--muted);font-size:.72rem;min-width:68px;text-align:left;flex-shrink:0;}
+.op-symbol{font-size:1.3rem;font-weight:700;color:var(--accent);width:24px;text-align:center;flex-shrink:0;}
+.eq-symbol{font-size:1.1rem;color:var(--green);width:24px;text-align:center;flex-shrink:0;}
+.cells{display:flex;gap:3px;align-items:center;}
+
+.pcell{width:44px;height:50px;background:var(--card2);border:2px solid var(--border);border-radius:8px;
+  color:var(--text);font-family:'Anek Bangla',sans-serif;font-size:1.35rem;font-weight:700;
+  text-align:center;padding:0;outline:none;transition:border-color .18s,background .18s;-moz-appearance:textfield;}
+.pcell::-webkit-outer-spin-button,.pcell::-webkit-inner-spin-button{-webkit-appearance:none;}
+.pcell:focus{border-color:var(--accent);background:#0b2418;box-shadow:0 0 0 3px rgba(52,211,153,.12);}
+.pcell.correct{border-color:var(--green)!important;background:#052e16!important;}
+.pcell.wrong{border-color:var(--red)!important;background:#2d0a0a!important;}
+.pcell[readonly]{background:#1a2540;cursor:default;border-color:#293548;}
+
+.divider-line{height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;margin:4px 0 4px 68px;}
+
+/* overflow */
+.overflow-wrap{display:none;justify-content:flex-end;align-items:flex-end;gap:6px;margin-top:4px;padding-left:68px;}
+.overflow-wrap.show{display:flex;}
+.overflow-cell{width:44px;height:50px;background:var(--card2);border:2px dashed var(--accent2);border-radius:8px;
+  color:var(--text);font-family:'Anek Bangla',sans-serif;font-size:1.35rem;font-weight:700;
+  text-align:center;padding:0;outline:none;-moz-appearance:textfield;}
+.overflow-cell::-webkit-outer-spin-button,.overflow-cell::-webkit-inner-spin-button{-webkit-appearance:none;}
+.overflow-cell:focus{border-color:var(--accent2);background:#1a1040;}
+.overflow-cell.correct{border-color:var(--green)!important;background:#052e16!important;}
+.overflow-cell.wrong{border-color:var(--red)!important;background:#2d0a0a!important;}
+.overflow-lbl{font-size:.58rem;color:var(--accent2);text-align:center;margin-top:2px;}
+
+/* progress */
+.progress-bar{display:flex;gap:4px;justify-content:center;margin:8px 0 4px;flex-wrap:wrap;}
+.p-dot{width:9px;height:9px;border-radius:50%;background:var(--border);transition:background .2s;}
+.p-dot.done{background:var(--green);}
+.p-dot.active-dot{background:var(--accent);}
+
+/* buttons */
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px;}
+.btn{padding:10px 20px;border-radius:50px;border:none;font-family:'Hind Siliguri',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0f172a;}
+.btn-primary:hover{transform:translateY(-2px);}
+.btn-success{background:linear-gradient(135deg,var(--green),#059669);color:#fff;}
+.btn-success:hover{transform:translateY(-2px);}
+.btn-yellow{background:linear-gradient(135deg,var(--yellow),#d97706);color:#0f172a;}
+.btn-yellow:hover{transform:translateY(-2px);}
+.btn-outline{background:transparent;border:2px solid var(--border);color:var(--muted);}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+
+/* result/hint */
+.result-msg{text-align:center;margin-top:10px;font-size:.95rem;font-weight:600;display:none;padding:10px;border-radius:10px;}
+.result-msg.success{background:#052e16;color:var(--green);border:1px solid var(--green);display:block;}
+.result-msg.error{background:#2d0a0a;color:var(--red);border:1px solid var(--red);display:block;}
+.hint-box{background:#0f1f1a;border:1px solid var(--accent);border-radius:12px;padding:12px;margin-top:12px;font-size:.86rem;line-height:1.7;color:#a7f3d0;display:none;}
+.hint-box.show{display:block;}
+.hint-title{font-weight:700;color:var(--accent);margin-bottom:6px;}
+.step-box{background:var(--card2);border-radius:12px;padding:12px;margin-top:10px;display:none;overflow-x:auto;}
+.step-box.show{display:block;}
+.step-box h4{color:var(--yellow);margin-bottom:10px;font-size:.88rem;}
+.solution-table{border-collapse:collapse;font-family:'Anek Bangla',sans-serif;min-width:100%;}
+.solution-table th{font-family:'Hind Siliguri',sans-serif;font-size:.68rem;color:var(--muted);padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);white-space:nowrap;}
+.solution-table td{padding:5px 6px;text-align:center;font-size:1rem;font-weight:600;border-bottom:1px solid rgba(255,255,255,.05);}
+.solution-table .place-name{font-family:'Hind Siliguri',sans-serif;font-size:.7rem;color:var(--muted);font-weight:400;}
+.solution-table .result-row td{border-top:2px solid var(--accent);color:var(--green);font-size:1.1rem;}
+.final-ans{margin-top:8px;text-align:center;font-family:'Anek Bangla',sans-serif;font-size:1.05rem;color:var(--green);font-weight:700;}
+
+/* YES/NO popup */
+.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;display:none;justify-content:center;align-items:center;}
+.popup-box{background:var(--card);border:2px solid var(--accent);border-radius:20px;padding:24px 20px;max-width:310px;width:90%;text-align:center;}
+.popup-title{font-size:.95rem;font-weight:700;color:var(--accent);margin-bottom:4px;}
+.popup-place{font-size:1.2rem;font-weight:700;color:var(--text);margin-bottom:6px;font-family:'Anek Bangla',sans-serif;}
+.popup-question{font-size:.84rem;color:var(--muted);margin-bottom:12px;line-height:1.6;}
+.carry-show{background:#1a1f10;border:1px solid var(--yellow);border-radius:10px;padding:10px;margin-bottom:12px;display:none;}
+.carry-show.show{display:block;}
+.carry-show .c-num{font-family:'Anek Bangla',sans-serif;font-size:2rem;font-weight:700;color:var(--yellow);}
+.carry-show .c-lbl{font-size:.7rem;color:var(--muted);}
+.popup-btns{display:flex;gap:10px;justify-content:center;}
+.popup-btn{padding:10px 22px;border-radius:50px;border:none;font-family:'Hind Siliguri',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.popup-yes{background:linear-gradient(135deg,var(--accent),#059669);color:#0f172a;}
+.popup-yes:hover{transform:scale(1.05);}
+.popup-no{background:linear-gradient(135deg,#475569,#334155);color:var(--text);}
+.popup-no:hover{transform:scale(1.05);}
+
+/* Congrats */
+.congrats-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3000;display:none;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px;}
+.congrats-overlay.show{display:flex;}
+.congrats-flowers{font-size:3rem;line-height:1.4;margin-bottom:8px;animation:fb 1s ease infinite alternate;}
+@keyframes fb{from{transform:scale(1) translateY(0);}to{transform:scale(1.08) translateY(-6px);}}
+.congrats-title{font-family:'Anek Bangla',sans-serif;font-size:1.7rem;font-weight:700;
+  background:linear-gradient(135deg,#fde68a,#34d399,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+.congrats-sub{color:var(--muted);font-size:.88rem;margin-bottom:12px;}
+.congrats-equation{font-family:'Anek Bangla',sans-serif;font-size:1.3rem;font-weight:700;color:var(--green);
+  background:var(--card);padding:12px 22px;border-radius:12px;border:1px solid var(--green);margin-bottom:18px;line-height:1.7;}
+.confetti-container{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.confetti{position:absolute;width:7px;height:7px;border-radius:2px;animation:fall linear forwards;}
+@keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+
+/* modal big view */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;justify-content:center;align-items:center;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--card);border:2px solid var(--accent);border-radius:20px;padding:32px;max-width:380px;width:90%;text-align:center;position:relative;max-height:90vh;overflow-y:auto;}
+.modal-close{position:absolute;top:10px;right:14px;background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;}
+.modal-big{font-family:'Anek Bangla',sans-serif;font-size:64px;font-weight:700;line-height:1.25;display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+.m-num{color:var(--text);}
+.m-plus{color:var(--accent);font-size:50px;align-self:flex-start;}
+.m-line{width:100%;height:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;}
+.m-ans{color:var(--green);}
+.modal-label{color:var(--muted);font-size:.82rem;margin-top:12px;}
+
+/* quiz stats */
+.quiz-info{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;}
+.quiz-badge{background:var(--card2);border:1px solid var(--border);border-radius:50px;padding:5px 14px;font-size:.8rem;color:var(--muted);}
+.quiz-badge span{color:var(--accent);font-weight:700;}
+
+/* samples */
+.sample-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;}
+.sample-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px;transition:border-color .2s;}
+.sample-card:hover{border-color:var(--accent);}
+.sample-display{font-size:1.2rem;font-weight:700;text-align:center;line-height:1.8;color:var(--text);margin-bottom:8px;font-family:'Anek Bangla',sans-serif;}
+.s-plus{color:var(--accent);}.s-ans{color:var(--green);}
+.s-line{width:60px;height:2px;background:var(--border);margin:2px auto;}
+.sample-actions{display:flex;gap:5px;justify-content:center;}
+.btn-sm{padding:5px 11px;border-radius:50px;border:none;font-family:'Hind Siliguri',sans-serif;font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-sm-edit{background:var(--card);border:1px solid var(--accent2);color:var(--accent2);}
+.btn-sm-del{background:var(--card);border:1px solid var(--red);color:var(--red);}
+.btn-sm-practice{background:var(--card);border:1px solid var(--green);color:var(--green);}
+.btn-sm-edit:hover{background:var(--accent2);color:#fff;}
+.btn-sm-del:hover{background:var(--red);color:#fff;}
+.btn-sm-practice:hover{background:var(--green);color:#0f172a;}
+.edit-row{display:none;gap:4px;align-items:center;justify-content:center;margin-bottom:8px;flex-wrap:wrap;}
+.edit-row.visible{display:flex;}
+.edit-input{width:65px;background:var(--card);border:2px solid var(--accent);border-radius:8px;color:var(--text);font-family:'Hind Siliguri',sans-serif;font-size:.9rem;text-align:center;padding:4px;outline:none;}
+.add-form{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:center;padding:12px;background:var(--card2);border:1px dashed var(--border);border-radius:12px;margin-top:12px;}
+.add-input{width:95px;background:var(--card);border:2px solid var(--border);border-radius:10px;color:var(--text);font-family:'Hind Siliguri',sans-serif;font-size:1rem;text-align:center;padding:8px;outline:none;transition:border-color .2s;}
+.add-input:focus{border-color:var(--accent);}
+
+@media(max-width:520px){
+  .pcell,.overflow-cell{width:36px;height:42px;font-size:1.15rem;}
+  .pl-lbl,.carry-cell{width:36px;}
+  .divider-line{margin-left:58px;}
+  .row-label{min-width:56px;font-size:.68rem;}
+  .carry-spacer{min-width:58px;}
+  .modal-big{font-size:48px;}
+  .m-plus{font-size:38px;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>➕ যোগ অনুশীলন</h1>
+  <p>দুই লাইন থেকে পাঁচ লাইন পর্যন্ত যোগ — একক থেকে কোটি</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('manual',this)">✏️ ম্যানুয়াল</button>
+  <button class="tab-btn" onclick="switchTab('auto',this)">🎲 অটো কুইজ</button>
+  <button class="tab-btn" onclick="switchTab('samples',this)">📚 নমুনা</button>
+</div>
+
+<!-- ===== MANUAL ===== -->
+<div id="panel-manual" class="panel active">
+<div class="card">
+  <div class="card-title">✏️ লাইন সংখ্যা বেছে সংখ্যা দিন, তারপর ঘরে ঘরে উত্তর লিখুন</div>
+
+  <!-- line count subtabs -->
+  <div class="subtabs">
+    <button class="subtab-btn active" onclick="setLines('m',2,this)">২ লাইন</button>
+    <button class="subtab-btn" onclick="setLines('m',3,this)">৩ লাইন</button>
+    <button class="subtab-btn" onclick="setLines('m',4,this)">৪ লাইন</button>
+    <button class="subtab-btn" onclick="setLines('m',5,this)">৫ লাইন</button>
+  </div>
+
+  <div id="m-entry-grid" class="entry-grid"></div>
+  <button class="set-btn" onclick="rebuildManual()">↩ সেট করুন</button>
+
+  <div style="margin-top:16px;">
+    <div id="m-carry-row" class="carry-row"><div class="carry-spacer"></div></div>
+    <div class="place-labels" id="m-labels"></div>
+    <div id="m-num-rows"></div>
+    <div class="divider-line" id="m-divider"></div>
+    <div class="num-row"><span class="row-label">উত্তর</span><span class="eq-symbol">=</span><div class="cells" id="m-ans-cells"></div></div>
+    <div id="m-overflow-wrap" class="overflow-wrap"></div>
+  </div>
+
+  <div class="progress-bar" id="m-progress"></div>
+  <div class="btn-row">
+    <button class="btn btn-success" onclick="checkManual()">✅ যাচাই</button>
+    <button class="btn btn-primary" onclick="showBigView('m')">🔍 বড় দেখুন</button>
+    <button class="btn btn-outline" onclick="clearManual()">🗑️ মুছুন</button>
+  </div>
+  <div id="m-result" class="result-msg"></div>
+  <div id="m-hint" class="hint-box"><div class="hint-title">💡 দিকনির্দেশনা</div><div id="m-hint-text"></div></div>
+  <div id="m-steps" class="step-box"><h4>🔢 ঘরে ঘরে সমাধান</h4><div id="m-steps-text"></div></div>
+</div>
+</div>
+
+<!-- ===== AUTO ===== -->
+<div id="panel-auto" class="panel">
+<div class="card">
+  <div class="card-title">🎲 অটো কুইজ</div>
+  <div class="quiz-info">
+    <div class="quiz-badge">সঠিক: <span id="q-correct">০</span></div>
+    <div class="quiz-badge">ভুল: <span id="q-wrong">০</span></div>
+    <div class="quiz-badge">মোট: <span id="q-total">০</span></div>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;">
+    <select id="q-level" style="background:var(--card2);border:1px solid var(--border);color:var(--text);font-family:'Hind Siliguri',sans-serif;font-size:.85rem;padding:7px 14px;border-radius:50px;outline:none;cursor:pointer;">
+      <option value="easy">সহজ (২ ঘর)</option>
+      <option value="medium" selected>মধ্যম (৩ ঘর)</option>
+      <option value="hard">কঠিন (৪-৫ ঘর)</option>
+      <option value="expert">বিশেষজ্ঞ (৬-৮ ঘর)</option>
+    </select>
+    <select id="q-lines" style="background:var(--card2);border:1px solid var(--border);color:var(--text);font-family:'Hind Siliguri',sans-serif;font-size:.85rem;padding:7px 14px;border-radius:50px;outline:none;cursor:pointer;">
+      <option value="2">২ লাইন</option>
+      <option value="3" selected>৩ লাইন</option>
+      <option value="4">৪ লাইন</option>
+      <option value="5">৫ লাইন</option>
+    </select>
+  </div>
+
+  <div id="q-carry-row" class="carry-row"><div class="carry-spacer"></div></div>
+  <div class="place-labels" id="q-labels"></div>
+  <div id="q-num-rows"></div>
+  <div class="divider-line" id="q-divider"></div>
+  <div class="num-row"><span class="row-label">উত্তর</span><span class="eq-symbol">=</span><div class="cells" id="q-ans-cells"></div></div>
+  <div id="q-overflow-wrap" class="overflow-wrap"></div>
+  <div class="progress-bar" id="q-progress"></div>
+
+  <div class="btn-row">
+    <button class="btn btn-yellow" onclick="genQuestion()">🎲 নতুন অংক</button>
+    <button class="btn btn-success" onclick="checkAuto()">✅ যাচাই</button>
+    <button class="btn btn-primary" onclick="showBigView('q')">🔍 বড় দেখুন</button>
+  </div>
+  <div id="q-result" class="result-msg"></div>
+  <div id="q-hint" class="hint-box"><div class="hint-title">💡 দিকনির্দেশনা</div><div id="q-hint-text"></div></div>
+  <div id="q-steps" class="step-box"><h4>🔢 ঘরে ঘরে সমাধান</h4><div id="q-steps-text"></div></div>
+</div>
+</div>
+
+<!-- ===== SAMPLES ===== -->
+<div id="panel-samples" class="panel">
+<div class="card">
+  <div class="card-title">📚 নমুনা যোগ</div>
+  <div id="sample-grid" class="sample-grid"></div>
+  <div class="add-form" id="sample-add-form">
+    <div id="sample-add-inputs" style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;"></div>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:center;">
+      <select id="sample-lines" style="background:var(--card2);border:1px solid var(--border);color:var(--text);font-family:'Hind Siliguri',sans-serif;font-size:.82rem;padding:6px 12px;border-radius:50px;outline:none;" onchange="renderSampleAddForm()">
+        <option value="2">২ লাইন</option>
+        <option value="3" selected>৩ লাইন</option>
+        <option value="4">৪ লাইন</option>
+        <option value="5">৫ লাইন</option>
+      </select>
+      <button class="btn btn-primary btn-sm" style="padding:8px 16px;border-radius:50px;" onclick="addSample()">➕ যোগ করুন</button>
+    </div>
+  </div>
+  <div id="add-msg" style="text-align:center;margin-top:8px;font-size:.82rem;color:var(--red);display:none;"></div>
+</div>
+</div>
+
+<!-- BIG VIEW MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div style="color:var(--muted);font-size:.8rem;margin-bottom:12px;">এক নজরে দেখুন</div>
+    <div class="modal-big" id="modal-content"></div>
+    <div class="modal-label" id="modal-label"></div>
+  </div>
+</div>
+
+<!-- YES/NO POPUP -->
+<div class="popup-overlay" id="popup">
+  <div class="popup-box">
+    <div class="popup-title">🔁 হাত (carry) আছে?</div>
+    <div class="popup-place" id="popup-place-name"></div>
+    <div class="popup-question" id="popup-question"></div>
+    <div class="carry-show" id="popup-carry">
+      <div class="c-num" id="popup-carry-num">১</div>
+      <div class="c-lbl" id="popup-carry-lbl">← পরের ঘরে হাত যোগ হবে</div>
+    </div>
+    <div class="popup-btns">
+      <button class="popup-btn popup-yes" onclick="popupAnswer(true)">✔ হ্যাঁ</button>
+      <button class="popup-btn popup-no" onclick="popupAnswer(false)">✘ না</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONGRATS -->
+<div class="congrats-overlay" id="congrats">
+  <div class="confetti-container" id="confetti-container"></div>
+  <div class="congrats-flowers" id="congrats-flowers"></div>
+  <div class="congrats-title">অভিনন্দন! 🎊</div>
+  <div class="congrats-sub" id="congrats-sub"></div>
+  <div class="congrats-equation" id="congrats-eq"></div>
+  <button class="btn btn-success" onclick="closeCongrads()" style="font-size:.95rem;padding:12px 32px;z-index:1;">আবার অনুশীলন করুন ➡</button>
+</div>
+
+<script>
+const PLACES=['একক','দশক','শতক','হাজার','দশ-হাজার','লক্ষ','নিযুত','কোটি'];
+const FLOWERS=['🌸','🌺','🌼','🌻','🌹','💐','🪷','🌷'];
+const ROW_LABELS=['প্রথম','দ্বিতীয়','তৃতীয়','চতুর্থ','পঞ্চম'];
+
+// State
+let mSt={nums:[],d:0,dAns:0,cells:[],carries:[],lineCount:2};
+let qSt={nums:[],d:0,dAns:0,cells:[],carries:[],lineCount:2};
+let qStats={correct:0,wrong:0,total:0};
+let popupCurrent=null;
+let mLineCount=2, qLineCount=2;
+
+function numDigits(n){return String(n).length;}
+function getDigitsArr(n,len){return String(Math.abs(n)).padStart(len,'0').split('').reverse().map(Number);}
+function sumArray(arr){return arr.reduce((a,b)=>a+b,0);}
+
+// compute carries for multi-number addition
+// returns carries[i] = carry INTO place i (can be 0,1,2,3...)
+function computeCarries(nums,d){
+  const numDs=nums.map(n=>getDigitsArr(n,d));
+  const carries=new Array(d+2).fill(0);
+  let c=0;
+  for(let i=0;i<d;i++){
+    let s=c;
+    for(const nd of numDs) s+=nd[i]||0;
+    c=Math.floor(s/10);
+    carries[i+1]=c;
+  }
+  return carries;
+}
+
+// ── Build UI ──
+function buildUI(prefix,nums){
+  const correct=sumArray(nums);
+  const d=Math.max(...nums.map(n=>numDigits(n)));
+  const dAns=numDigits(correct);
+  const hasOverflow=dAns>d;
+  const carries=computeCarries(nums,d);
+  const lineCount=nums.length;
+
+  // Place labels
+  const labelsEl=document.getElementById(prefix+'-labels');
+  labelsEl.innerHTML='';
+  for(let i=d-1;i>=0;i--){
+    const sp=document.createElement('span');
+    sp.className='pl-lbl';sp.textContent=PLACES[i]||(i+1)+'তম';
+    labelsEl.appendChild(sp);
+  }
+
+  // Carry row
+  const carryRow=document.getElementById(prefix+'-carry-row');
+  carryRow.innerHTML='<div class="carry-spacer"></div>';
+  for(let i=d-1;i>=0;i--){
+    const cc=document.createElement('div');
+    cc.className='carry-cell';cc.id=prefix+'-cc-'+i;
+    carryRow.appendChild(cc);
+    if(i>0){const g=document.createElement('div');g.style.width='3px';carryRow.appendChild(g);}
+  }
+
+  // Number rows (readonly)
+  const numRowsEl=document.getElementById(prefix+'-num-rows');
+  numRowsEl.innerHTML='';
+  nums.forEach((n,li)=>{
+    const nD=getDigitsArr(n,d);
+    const row=document.createElement('div');
+    row.className='num-row';
+    const lbl=document.createElement('span');
+    lbl.className='row-label';lbl.textContent=ROW_LABELS[li]||`${li+1}তম`;
+    const op=document.createElement('span');
+    op.className='op-symbol';op.textContent=li===0?'':'+';
+    if(li===0) op.style.opacity='0';
+    const cellsDiv=document.createElement('div');
+    cellsDiv.className='cells';
+    for(let i=d-1;i>=0;i--){
+      const inp=document.createElement('input');
+      inp.type='text';inp.readOnly=true;inp.className='pcell';
+      inp.value=nD[i]===0&&i>=numDigits(n)?'':nD[i];
+      cellsDiv.appendChild(inp);
+      if(i>0){const g=document.createElement('div');g.style.width='3px';cellsDiv.appendChild(g);}
+    }
+    row.appendChild(lbl);row.appendChild(op);row.appendChild(cellsDiv);
+    numRowsEl.appendChild(row);
+  });
+
+  // Divider
+  const divEl=document.getElementById(prefix+'-divider');
+  if(divEl) divEl.style.width=(d*47+24)+'px';
+
+  // Answer cells
+  const ansEl=document.getElementById(prefix+'-ans-cells');
+  ansEl.innerHTML='';
+  const ansDigits=getDigitsArr(correct,dAns);
+  const cells=new Array(dAns).fill(null);
+
+  for(let i=d-1;i>=0;i--){
+    const inp=document.createElement('input');
+    inp.type='text';inp.inputMode='numeric';inp.className='pcell';
+    inp.maxLength=1;inp.placeholder='_';
+    inp.dataset.place=i;inp.dataset.correct=ansDigits[i];
+    inp.addEventListener('input',function(){
+      const v=this.value.replace(/[^0-9]/g,'');
+      this.value=v?v[v.length-1]:'';
+      if(this.value!==''){
+        const pl=parseInt(this.dataset.place);
+        const carryOut=carries[pl+1]||0;
+        if(carryOut>0){
+          triggerPopup(prefix,pl,carries,cells,d,dAns,hasOverflow,carryOut);
+        } else {
+          moveNext(prefix,pl,cells,dAns);
+        }
+      }
+      updateProgress(prefix,cells,dAns);
+    });
+    inp.addEventListener('keydown',function(e){
+      const pl=parseInt(this.dataset.place);
+      if(e.key==='Backspace'&&this.value==='') movePrev(prefix,pl,cells);
+      if(e.key==='ArrowLeft') movePrev(prefix,pl,cells);
+      if(e.key==='ArrowRight') moveNext(prefix,pl,cells,dAns);
+      if(e.key==='Enter') prefix==='m'?checkManual():checkAuto();
+    });
+    ansEl.appendChild(inp);
+    if(i>0){const g=document.createElement('div');g.style.width='3px';ansEl.appendChild(g);}
+    cells[i]=inp;
+  }
+
+  // Overflow
+  const ovWrap=document.getElementById(prefix+'-overflow-wrap');
+  ovWrap.innerHTML='';
+  if(hasOverflow){
+    ovWrap.classList.add('show');
+    const oc=document.createElement('input');
+    oc.type='text';oc.inputMode='numeric';oc.className='overflow-cell';
+    oc.maxLength=1;oc.placeholder='_';
+    oc.dataset.place=d;oc.dataset.correct=ansDigits[d]||0;
+    const lbl=document.createElement('div');lbl.className='overflow-lbl';lbl.textContent=PLACES[d]||(d+1)+'তম';
+    const wrap=document.createElement('div');
+    const mainCont=document.createElement('div');mainCont.className='cells';
+    // move main cells into mainCont
+    while(ansEl.firstChild) mainCont.appendChild(ansEl.firstChild);
+    wrap.appendChild(oc);wrap.appendChild(lbl);
+    ovWrap.appendChild(wrap);ovWrap.appendChild(mainCont);
+    oc.addEventListener('input',function(){
+      const v=this.value.replace(/[^0-9]/g,'');this.value=v?v[v.length-1]:'';
+      updateProgress(prefix,cells,dAns);
+    });
+    oc.addEventListener('keydown',function(e){
+      if(e.key==='Backspace'&&this.value===''&&cells[d-1]) cells[d-1].focus();
+      if(e.key==='Enter') prefix==='m'?checkManual():checkAuto();
+    });
+    cells[d]=oc;
+  } else {
+    ovWrap.classList.remove('show');
+  }
+
+  buildProgress(prefix,dAns);
+
+  if(prefix==='m') mSt={nums,d,dAns,cells,carries,lineCount};
+  else             qSt={nums,d,dAns,cells,carries,lineCount};
+
+  setTimeout(()=>{if(cells[0]) cells[0].focus();},80);
+}
+
+// ── Popup ──
+function triggerPopup(prefix,place,carries,cells,d,dAns,hasOverflow,carryVal){
+  popupCurrent={prefix,place,carries,cells,d,dAns,hasOverflow,carryVal};
+  const nextPlace=place+1;
+  const nextName=nextPlace<PLACES.length?PLACES[nextPlace]:`${nextPlace+1}তম ঘর`;
+  document.getElementById('popup-place-name').textContent=PLACES[place]||`${place+1}তম ঘর`;
+  document.getElementById('popup-carry-num').textContent=carryVal;
+  document.getElementById('popup-carry-lbl').textContent=`← ${nextName} ঘরে হাতের ${carryVal} যোগ হবে`;
+  document.getElementById('popup-question').textContent=
+    `এই ঘরের যোগফল ${carryVal*10} বা বেশি। ${nextName} ঘরে হাতের ${carryVal} যোগ করতে হবে?`;
+  document.getElementById('popup-carry').classList.add('show');
+  document.getElementById('popup').style.display='flex';
+}
+function popupAnswer(yes){
+  document.getElementById('popup').style.display='none';
+  if(!popupCurrent) return;
+  const {prefix,place,carries,cells,d,dAns,hasOverflow,carryVal}=popupCurrent;
+  if(yes){
+    const cc=document.getElementById(prefix+'-cc-'+(place+1));
+    if(cc){cc.textContent=carryVal;cc.style.color='var(--yellow)';cc.style.fontWeight='700';}
+  }
+  moveNext(prefix,place,cells,dAns);
+  popupCurrent=null;
+}
+function moveNext(prefix,pl,cells,dAns){
+  const next=pl+1;
+  if(next<dAns&&cells[next]) cells[next].focus();
+}
+function movePrev(prefix,pl,cells){
+  const prev=pl-1;
+  if(prev>=0&&cells[prev]) cells[prev].focus();
+}
+
+function buildProgress(prefix,dAns){
+  const bar=document.getElementById(prefix+'-progress');bar.innerHTML='';
+  for(let i=0;i<dAns;i++){
+    const d=document.createElement('div');d.className='p-dot';d.id=prefix+'-dot-'+i;d.title=PLACES[i]||(i+1)+'তম';
+    bar.appendChild(d);
+  }
+}
+function updateProgress(prefix,cells,dAns){
+  for(let i=0;i<dAns;i++){
+    const dot=document.getElementById(prefix+'-dot-'+i);if(!dot)continue;
+    if(cells[i]&&cells[i]===document.activeElement) dot.className='p-dot active-dot';
+    else if(cells[i]&&cells[i].value!=='') dot.className='p-dot done';
+    else dot.className='p-dot';
+  }
+}
+
+// ── Manual entry grid ──
+function buildEntryGrid(prefix,lineCount){
+  const grid=document.getElementById(prefix+'-entry-grid');
+  grid.innerHTML='';
+  const defaults2=[347,285];
+  const defaults3=[234,156,389];
+  const defaults4=[123,456,234,187];
+  const defaults5=[123,234,345,456,567];
+  const defArr=lineCount===2?defaults2:lineCount===3?defaults3:lineCount===4?defaults4:defaults5;
+  for(let i=0;i<lineCount;i++){
+    const row=document.createElement('div');row.className='entry-row-item';
+    const lbl=document.createElement('span');lbl.className='entry-lbl';lbl.textContent=ROW_LABELS[i];
+    const sym=document.createElement('span');sym.className='plus-sym';sym.textContent=i===0?'':'+';if(i===0)sym.style.opacity='0';
+    const inp=document.createElement('input');
+    inp.type='number';inp.min='0';inp.max='99999999';
+    inp.className='entry-inp';inp.id=prefix+'-en-'+i;
+    inp.value=defArr[i]||'';
+    row.appendChild(lbl);row.appendChild(sym);row.appendChild(inp);
+    grid.appendChild(row);
+  }
+}
+
+function setLines(prefix,n,btn){
+  if(prefix==='m') mLineCount=n;
+  else qLineCount=n;
+  // update subtab active
+  btn.closest('.subtabs').querySelectorAll('.subtab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  buildEntryGrid(prefix,n);
+  // auto rebuild
+  if(prefix==='m') rebuildManual();
+}
+
+function getEntryNums(prefix,lineCount){
+  const nums=[];
+  for(let i=0;i<lineCount;i++){
+    const v=parseInt(document.getElementById(prefix+'-en-'+i)?.value)||0;
+    nums.push(v);
+  }
+  return nums;
+}
+
+function rebuildManual(){
+  const nums=getEntryNums('m',mLineCount).filter(n=>n>0);
+  if(nums.length<2){return;}
+  clearManualState();
+  buildUI('m',nums);
+}
+function clearManualState(){
+  document.getElementById('m-result').className='result-msg';
+  document.getElementById('m-hint').classList.remove('show');
+  document.getElementById('m-steps').classList.remove('show');
+  document.getElementById('m-carry-row').querySelectorAll('.carry-cell').forEach(cc=>cc.textContent='');
+}
+function clearManual(){
+  if(mSt.cells) mSt.cells.forEach(c=>{if(c){c.value='';c.classList.remove('correct','wrong');}});
+  clearManualState();
+  if(mSt.cells&&mSt.cells[0]) mSt.cells[0].focus();
+}
+
+// ── Check ──
+function doCheck(prefix){
+  const st=prefix==='m'?mSt:qSt;
+  const {nums,d,dAns,cells}=st;
+  if(!nums||!nums.length){showMsg(prefix,'error','❌ সংখ্যা দিন!');return;}
+  const correct=sumArray(nums);
+  const ansDigits=getDigitsArr(correct,dAns);
+  let allFilled=true,allCorrect=true;
+  cells.forEach((c,i)=>{
+    if(!c)return;
+    const given=parseInt(c.value);
+    if(c.value==='') allFilled=false;
+    c.classList.remove('correct','wrong');
+    if(!isNaN(given)){
+      if(given===ansDigits[i]) c.classList.add('correct');
+      else{c.classList.add('wrong');allCorrect=false;}
+    } else allCorrect=false;
+  });
+  if(!allFilled){showMsg(prefix,'error','❌ সব ঘর পূরণ করুন!');return;}
+  if(allCorrect){
+    showCongrats(nums,correct,prefix);
+    hideHintSteps(prefix);
+  } else {
+    let userAns=0;cells.forEach((c,i)=>{if(c)userAns+=(parseInt(c.value)||0)*Math.pow(10,i);});
+    showMsg(prefix,'error','❌ কিছু ঘরের উত্তর ভুল! নিচে দেখুন।');
+    document.getElementById(prefix==='m'?'m-hint':'q-hint').classList.add('show');
+    document.getElementById(prefix==='m'?'m-hint-text':'q-hint-text').innerHTML=buildHint(nums,userAns,correct);
+    document.getElementById(prefix==='m'?'m-steps':'q-steps').classList.add('show');
+    document.getElementById(prefix==='m'?'m-steps-text':'q-steps-text').innerHTML=buildStepTable(nums,correct,d,dAns);
+    if(prefix==='q'){qStats.wrong++;updateQuizStats();}
+  }
+}
+function checkManual(){doCheck('m');}
+function checkAuto(){qStats.total++;doCheck('q');}
+
+function hideHintSteps(prefix){
+  document.getElementById(prefix==='m'?'m-hint':'q-hint').classList.remove('show');
+  document.getElementById(prefix==='m'?'m-steps':'q-steps').classList.remove('show');
+}
+function showMsg(prefix,type,text){
+  const el=document.getElementById(prefix==='m'?'m-result':'q-result');
+  el.textContent=text;el.className='result-msg '+type;
+}
+function updateQuizStats(){
+  document.getElementById('q-correct').textContent=qStats.correct;
+  document.getElementById('q-wrong').textContent=qStats.wrong;
+  document.getElementById('q-total').textContent=qStats.total;
+}
+
+// ── Step table ──
+function buildStepTable(nums,correct,d,dAns){
+  const numDs=nums.map(n=>getDigitsArr(n,d));
+  let carryIn=0;const rows=[];
+  for(let i=0;i<dAns;i++){
+    const digits=numDs.map(nd=>nd[i]||0);
+    const sum=digits.reduce((a,b)=>a+b,0)+carryIn;
+    const write=sum%10;const carryOut=Math.floor(sum/10);
+    rows.push({pl:PLACES[i]||(i+1)+'তম',digits,carryIn,sum,write,carryOut});
+    carryIn=carryOut;
+  }
+  // Build header
+  let thNums='';
+  nums.forEach((n,i)=>thNums+=`<th>${ROW_LABELS[i]}</th>`);
+  let html=`<table class="solution-table"><tr><th>ঘর</th>${thNums}<th>হাত (আগে)</th><th>মোট</th><th>লিখি</th><th>হাত (পরে)</th></tr>`;
+  rows.forEach(r=>{
+    let tdNums='';r.digits.forEach(v=>tdNums+=`<td style="color:var(--blue)">${v}</td>`);
+    html+=`<tr>
+      <td class="place-name">${r.pl}</td>
+      ${tdNums}
+      <td style="color:var(--yellow)">${r.carryIn?`+${r.carryIn}`:'-'}</td>
+      <td style="color:var(--blue);font-weight:700">${r.sum}</td>
+      <td style="color:var(--green);font-size:1.1rem;font-weight:700">${r.write}</td>
+      <td style="color:var(--yellow)">${r.carryOut?`${r.carryOut}→`:'-'}</td>
+    </tr>`;
+  });
+  html+=`<tr class="result-row"><td colspan="${nums.length+5}">∴ ${nums.join(' + ')} = ${correct}</td></tr></table>`;
+  html+=`<div class="final-ans">✅ সঠিক উত্তর: ${correct}</div>`;
+  return html;
+}
+
+function buildHint(nums,given,correct){
+  const diff=Math.abs(given-correct);
+  let msg=`<b>তুমি লিখেছ:</b> ${given}, <b>সঠিক উত্তর:</b> ${correct}<br>`;
+  msg+=given>correct?`উত্তর ${diff} বেশি।`:`উত্তর ${diff} কম।`;
+  msg+=`<br>📌 <b>${nums.join(' + ')} = ${correct}</b>`;
+  return msg;
+}
+
+// ── Congrats ──
+function showCongrats(nums,correct,prefix){
+  const el=document.getElementById('congrats');
+  document.getElementById('confetti-container').innerHTML='';
+  document.getElementById('congrats-flowers').textContent=
+    Array.from({length:7},()=>FLOWERS[Math.floor(Math.random()*FLOWERS.length)]).join(' ');
+  document.getElementById('congrats-sub').textContent='চমৎকার! সব ঘর সঠিক!';
+  document.getElementById('congrats-eq').textContent=nums.join(' + ')+' = '+correct;
+  el.classList.add('show');
+  const colors=['#f59e0b','#34d399','#38bdf8','#a78bfa','#f87171','#fde68a','#6ee7b7'];
+  const fc=document.getElementById('confetti-container');
+  for(let i=0;i<70;i++){
+    const c=document.createElement('div');c.className='confetti';
+    c.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};
+      width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;
+      animation-duration:${2+Math.random()*3}s;animation-delay:${Math.random()*2}s;
+      border-radius:${Math.random()>.5?'50%':'2px'};`;
+    fc.appendChild(c);
+  }
+  if(prefix==='q'){qStats.correct++;updateQuizStats();}
+}
+function closeCongrads(){document.getElementById('congrats').classList.remove('show');}
+
+// ── Big view ──
+function showBigView(prefix){
+  const st=prefix==='m'?mSt:qSt;
+  const {nums,cells,dAns}=st;
+  if(!nums||!nums.length){alert('আগে সংখ্যা দিন!');return;}
+  let userAns=0;cells.forEach((c,i)=>{if(c)userAns+=(parseInt(c.value)||0)*Math.pow(10,i);});
+  const correct=sumArray(nums);
+  let html='';
+  nums.forEach((n,i)=>{
+    if(i===0) html+=`<div class="m-num">${n}</div>`;
+    else html+=`<div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:flex-end;"><span class="m-plus">+</span><span class="m-num">${n}</span></div>`;
+  });
+  html+=`<div class="m-line"></div><div class="m-ans">${userAns||'?'}</div>`;
+  document.getElementById('modal-content').innerHTML=html;
+  document.getElementById('modal-label').textContent=userAns===correct?'✅ সঠিক!':(userAns?`সঠিক: ${correct}`:'');
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// ── Auto Quiz ──
+function genQuestion(){
+  const level=document.getElementById('q-level').value;
+  const lines=parseInt(document.getElementById('q-lines').value)||2;
+  qLineCount=lines;
+  let dMax=level==='easy'?2:level==='medium'?3:level==='hard'?4+Math.floor(Math.random()*2):6+Math.floor(Math.random()*3);
+  const max=Math.pow(10,dMax)-1,min=Math.pow(10,dMax-1);
+  const nums=[];
+  for(let i=0;i<lines;i++) nums.push(Math.floor(Math.random()*(max-min))+min);
+  document.getElementById('q-result').className='result-msg';
+  hideHintSteps('q');
+  buildUI('q',nums);
+}
+
+// ── Samples ──
+let samples=[
+  {nums:[47,35]},{nums:[123,456]},{nums:[275,368]},
+  {nums:[234,156,389]},{nums:[500,300,200]},
+  {nums:[1234,5678,2345]},{nums:[123,456,234,187]},
+  {nums:[1000,2000,3000,4000]},{nums:[123,234,345,456,567]},
+  {nums:[10000,20000,30000,40000,50000]}
+];
+function renderSamples(){
+  const grid=document.getElementById('sample-grid');grid.innerHTML='';
+  samples.forEach((s,i)=>{
+    const ans=sumArray(s.nums);
+    const div=document.createElement('div');div.className='sample-card';
+    let dispHtml='';
+    s.nums.forEach((n,li)=>{
+      if(li===0) dispHtml+=`<div>${n}</div>`;
+      else dispHtml+=`<span class="s-plus">+ ${n}</span><br>`;
+    });
+    dispHtml+=`<div class="s-line"></div><span class="s-ans">= ${ans}</span>`;
+
+    let editInputs='';
+    s.nums.forEach((n,li)=>editInputs+=`<input type="number" class="edit-input" id="se-${i}-${li}" value="${n}" style="width:70px;">`);
+    div.innerHTML=`
+      <div class="edit-row" id="er-${i}">${editInputs}
+        <button class="btn-sm btn-sm-edit" onclick="saveEdit(${i})" style="padding:4px 8px;">💾</button>
+      </div>
+      <div class="sample-display">${dispHtml}</div>
+      <div class="sample-actions">
+        <button class="btn-sm btn-sm-edit" onclick="editSample(${i})">✏️</button>
+        <button class="btn-sm btn-sm-practice" onclick="practiceThis(${i})">🎯</button>
+        <button class="btn-sm btn-sm-del" onclick="delSample(${i})">🗑️</button>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+function renderSampleAddForm(){
+  const n=parseInt(document.getElementById('sample-lines').value)||2;
+  const cont=document.getElementById('sample-add-inputs');
+  cont.innerHTML='';
+  for(let i=0;i<n;i++){
+    const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:6px;';
+    row.innerHTML=`<span style="color:var(--muted);font-size:.72rem;min-width:40px;text-align:right;">${ROW_LABELS[i]}</span>
+      <span style="color:var(--accent);font-weight:700;">${i===0?'':'+' }</span>
+      <input type="number" id="sa-${i}" class="add-input" placeholder="${i+1}তম সংখ্যা" min="0" style="width:110px;">`;
+    cont.appendChild(row);
+  }
+}
+function editSample(i){document.getElementById('er-'+i).classList.toggle('visible');}
+function saveEdit(i){
+  const nums=samples[i].nums.map((_,li)=>parseInt(document.getElementById(`se-${i}-${li}`)?.value)||0);
+  if(nums.some(n=>isNaN(n))){alert('সংখ্যা সঠিক নয়!');return;}
+  samples[i]={nums};renderSamples();
+}
+function delSample(i){if(confirm('মুছে ফেলবেন?')){samples.splice(i,1);renderSamples();}}
+function practiceThis(i){
+  const s=samples[i];
+  mLineCount=s.nums.length;
+  // update subtab buttons
+  document.querySelectorAll('#panel-manual .subtab-btn').forEach((b,bi)=>{
+    b.classList.toggle('active',bi===mLineCount-2);
+  });
+  buildEntryGrid('m',mLineCount);
+  setTimeout(()=>{
+    s.nums.forEach((n,li)=>{
+      const el=document.getElementById('m-en-'+li);if(el) el.value=n;
+    });
+    rebuildManual();
+  },50);
+  switchTab('manual',document.querySelector('.tab-btn'));
+}
+function addSample(){
+  const n=parseInt(document.getElementById('sample-lines').value)||2;
+  const nums=[];
+  for(let i=0;i<n;i++){
+    const v=parseInt(document.getElementById('sa-'+i)?.value)||0;
+    if(v<=0){document.getElementById('add-msg').textContent=`❌ ${ROW_LABELS[i]} সংখ্যা দিন!`;document.getElementById('add-msg').style.display='block';return;}
+    nums.push(v);
+  }
+  samples.push({nums});
+  document.getElementById('add-msg').style.display='none';
+  renderSamples();renderSampleAddForm();
+}
+
+function switchTab(tab,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(tab==='samples'){renderSamples();renderSampleAddForm();}
+}
+
+// Init
+buildEntryGrid('m',2);
+rebuildManual();
+genQuestion();
+renderSamples();
+renderSampleAddForm();
+</script>
+</body>
+</html>
