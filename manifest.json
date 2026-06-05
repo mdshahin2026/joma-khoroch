@@ -1,0 +1,24 @@
+{
+  "name": "জমা-খরচ হিসাব",
+  "short_name": "জমা-খরচ",
+  "description": "ব্যক্তিগত আর্থিক হিসাব সফটওয়্যার",
+  "start_url": "/joma-khoroch/",
+  "display": "standalone",
+  "background_color": "#1a3a5c",
+  "theme_color": "#1a3a5c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%231a3a5c'/><text y='145' x='20' font-size='140'>💰</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%231a3a5c'/><text y='400' x='50' font-size='380'>💰</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["finance", "productivity"],
+  "lang": "bn"
+}
